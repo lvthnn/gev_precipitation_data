@@ -1,0 +1,74 @@
+\documentclass[12pt, a4paper]{article}
+
+\usepackage[scale=0.8]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amsfonts}
+\usepackage{newtxtext, newtxmath}
+\usepackage[scale=0.8]{noto-mono}
+\usepackage{bm}
+
+\usepackage{minted}
+
+\title{Application of Bayesian latent Gaussian models to
+       precipitation extremes in the context of extreme value theory}
+\author{Kári Hlynsson}
+\date{July 2024}
+
+\begin{document}
+  
+  \maketitle
+  
+  \begin{abstract}
+    \noindent
+    Effective modelling of extreme precipitation events have the potential
+    to reduce casualty and infrastructural damage as a result of natural
+    disasters such as those caused by floods. The application of Bayesian
+    hierarchical models (BHMs), particularly Bayesian latent Gaussian models
+    (BLGMs), has seen substantial success in mitigating the effects of these
+    events and motivating preventative measures. 
+    In this article, BLGMs are applied to precipitation data where the response
+    layer is modelled using the generalized extreme value (GEV) distribution.
+    Three models are compared, namely (i) a baseline model, (ii) a time-trend
+    model, and (iii) a piecewise-linear time trend model.\@ Important concepts
+    from extreme value theory are reviewed to give the reader perspective.
+  \end{abstract}
+
+  \section{Introduction}
+  \subsection{Motivation and statement of purpose}
+  Disastrous and often unlikely events such as floods, heatwaves or financial
+  market crashes can occur suddenly and without warning, leading to
+  loss of life and damage to infrastructure.\@ Accurate modelling of such
+  events has been the subject of great interest in the statistical community,
+  and has recently seen substantial success when considered in the context of
+  extreme value theory. In particular, Bayesian hierarchical models (BHMs) have
+  proven to be especially desirable due to their ability to incorporate prior
+  knowledge and to obtain a measure of uncertainty, for example by using the 
+  posterior predictive density when predicting likely future outcomes.
+
+  In this article, models of maximum cumulative precipitation in the period of
+  24 hours by year is modelled using the generalized extreme value (GEV)
+  distribution, which is a natural distribution to block maxima data (such as
+  yearly maxima), as follows from the Fisher-Tippett-Gnedenko theorem, briefly
+  discussed in the next section. The distribution has three parameters,
+  \(\mu\), \(\sigma\), and \(\xi\), which are often referred to as the 
+  \textit{location}, \textit{scale}, and \textit{shape} parameters,
+  respectively. Three models are considered, with increasing complexity. The
+  first model, the null model, claims that the precipitation data are
+  modelled with no trend, ignoring climate effects. The second model uses a
+  time trend in the location parameter of the GEV distribution. Lastly, the 
+  third model uses piecewise linear trends to predict changes in location
+  parameter with time. Comparison of the aforementioned models has the
+  potential to eludicate effects of climate change on extreme precipitation
+  events.
+
+  \section{A comparison of models}
+  The first model is as follows:
+  \[
+    y_t \sim \mathrm{GEV}(\mu, \sigma, \xi),
+  \]
+  where \(\mu \sim \mathcal N(0, 100^2)\), 
+  \(\sigma \sim \mathrm{Exponential(2)}\), and 
+  \(\xi \sim \mathrm{Beta}(4, 4)\).
+  
+\end{document}
