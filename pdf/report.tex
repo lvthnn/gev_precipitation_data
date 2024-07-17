@@ -62,13 +62,34 @@
   potential to eludicate effects of climate change on extreme precipitation
   events.
 
-  \section{A comparison of models}
-  The first model is as follows:
+  \section{Extreme value theory}
+  Fisher-Tippett theorem states that [...]. The GEV has likelihood
   \[
-    y_t \sim \mathrm{GEV}(\mu, \sigma, \xi),
+    \mathcal L(y \mid \mu, \sigma, \xi) = \sigma^{-1} \eta(y)^{\xi + 1}
+                                          \exp\big(-\eta(y)\big),
   \]
-  where \(\mu \sim \mathcal N(0, 100^2)\), 
-  \(\sigma \sim \mathrm{Exponential(2)}\), and 
-  \(\xi \sim \mathrm{Beta}(4, 4)\).
+  where
+  \[
+    \eta(y) = \begin{cases}
+      \left[1 + \xi \left(\frac{y - \mu}{\sigma}\right)\right]^{-1/\xi}
+      &\text{if } \xi \neq 0, \\
+      \exp\left(\frac{y - \mu}{\sigma}\right) &\text{if } \xi = 0.
+    \end{cases}
+  \]
+  Thus, the likelihood of the observed data is 
+  \begin{align*}
+    \mathcal L(\bm y \mid \mu, \sigma, \xi)
+    &= \prod_{i = 1}^n \mathcal L(y_i \mid \mu, \sigma, \xi) \\
+    &= \sigma^{-n} \prod_{i = 1}^n \eta(y_i)^{\xi + 1} \exp\big(
+       -\eta(y_i)\big),
+  \end{align*}
+  and by taking the log of the above we arrive at the log likelihood:
+  \[
+    \ell(\bm y \mid \mu, \sigma, \xi)
+    = -n \log(\sigma) + \sum_{i = 1}^n (1 + \xi) \log \eta(y_i)
+                      - \sum_{i = 1}^n \eta(y_i).
+  \]
+
+
   
 \end{document}

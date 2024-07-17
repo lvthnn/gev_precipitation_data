@@ -5,13 +5,30 @@ dt_maxprecip <- readr::read_csv(
   show_col_types = FALSE
 )
 
-null_data <- list(
+model_data <- list(
   n = nrow(dt_maxprecip),
   y = dt_maxprecip$max_precip
 )
 
+# set up cores
+
+options(mc.cores = parallel::detectCores())
+
+# null model
+
 null_fit <- stan(
   file = "src/nullmodel.stan",
-  data = null_data,
-  chains = 1,
+  data = model_data,
+  chains = 4,
+  iter = 13000,
+  warmup = 3000
+)
+
+# time trend model
+
+timetrend_fit <- stan(
+  file = "src/timetrend.stan",
+  data = model_data,
+  iter = 13000,
+  chains = 4
 )
