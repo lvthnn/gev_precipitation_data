@@ -12,7 +12,7 @@ parameters {
 }
 
 transformed parameters {
-   real xi = 2 * xi_0 - 1;
+   real xi = xi_0 - 0.5;
 }
 
 model {

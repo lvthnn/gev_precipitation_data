@@ -1,7 +1,9 @@
 # Setup
-ggplot2::theme_set(cowplot::theme_half_open(12))
-extrafont::font_import(pattern = "Times New Roman", prompt = FALSE)
-extrafont::loadfonts(device = "pdf")
+suppressMessages({
+  ggplot2::theme_set(cowplot::theme_half_open(12))
+  extrafont::font_import(pattern = "Times New Roman", prompt = FALSE)
+  extrafont::loadfonts(device = "pdf")
+})
 
 # Load in the data
 dt_maxprecip <- readr::read_csv(
@@ -131,8 +133,8 @@ null_fit <- rstan::stan(
   file = "src/nullmodel.stan",
   data = model_data,
   chains = 4,
-  iter = 13000,
-  warmup = 3000,
+  iter = 2000,
+  warmup = 1000,
   pars = c("mu", "sigma", "xi")
 )
 
@@ -148,3 +150,23 @@ timetrend_fit <- rstan::stan(
 )
 
 bayesplot::mcmc_trace(as.matrix(timetrend_fit))
+
+# Hierarchical model -- i.i.d. prior for random effects
+
+m <- 5
+tm <- floor(seq(1, nrow(dt_maxprecip), length = m + 2))[-c(1, m + 2)]
+
+
+hmodel_data <- list(
+  n = nrow(dt_maxprecip),
+  y = dt_maxprecip$max_precip,
+  t_j = floor(seq(1, nrow(dt_maxprecip), length = m + 2))[-c(1, m + 2)]
+)
+
+iid_fit <- rstan::stan(
+  file = "src/hierarchical.stan",
+  data = hmodel_data,
+  iter = 2000,
+  chains = 4,
+  init_r = 0.5
+)

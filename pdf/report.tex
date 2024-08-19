@@ -7,10 +7,12 @@
 
 \usepackage[UKenglish]{babel}
 
-\usepackage{amsmath, amsfonts}
+\usepackage{amsmath, amsfonts, amssymb}
 \usepackage{newtxtext, newtxmath}
 \usepackage[scale=0.8]{noto-mono}
 \usepackage{bm}
+
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
 
 \usepackage{graphicx}
 \usepackage{tabularx}
@@ -113,22 +115,22 @@
     using the standard \(t\)-distribution formula.}
     \begin{tabularx}{\textwidth}{XXXXX}
       \toprule
-      Decade & No. obs. & \(\overline y\)  & \(s_y\) & 95\% CI \\
+      Decade & No. obs. & \(\overline y\)  & \(s_y\) & 95\% CI      \\
       \midrule
-      1890 &  9 & 22.3 & 5.10 & [18.4, 26.2]\\
-      1900 & 10 & 23.3 & 7.64 & [17.8, 28.8]\\
-      1910 & 10 & 34.3 & 6.94 & [29.4, 39.3]\\
-      1920 & 10 & 30.3 & 12.2 & [21.7, 39.0]\\
-      1930 & 10 & 26.0 & 11.1 & [18.0, 34.0]\\
-      1940 & 10 & 28.8 & 5.09 & [25.1, 32.4]\\
-      1950 & 10 & 31.6 & 12.5 & [22.7, 40.5]\\
-      1960 & 10 & 30.3 & 9.88 & [23.2, 37.4]\\
-      1970 & 10 & 28.9 & 7.22 & [23.8, 34.1]\\
-      1980 & 10 & 34.0 & 7.98 & [28.3, 39.7]\\
-      1990 & 10 & 30.9 & 7.91 & [25.3, 36.6]\\
-      2000 & 10 & 37.8 & 13.0 & [28.5, 47.0]\\
-      2010 & 10 & 30.7 & 7.89 & [25.1, 36.4]\\
-      2020 &  3 & 24.5 & 4.58 & [13.1, 35.9]\\
+      1890   &  9       & 22.3             & 5.10    & [18.4, 26.2] \\
+      1900   & 10       & 23.3             & 7.64    & [17.8, 28.8] \\
+      1910   & 10       & 34.3             & 6.94    & [29.4, 39.3] \\
+      1920   & 10       & 30.3             & 12.2    & [21.7, 39.0] \\
+      1930   & 10       & 26.0             & 11.1    & [18.0, 34.0] \\
+      1940   & 10       & 28.8             & 5.09    & [25.1, 32.4] \\
+      1950   & 10       & 31.6             & 12.5    & [22.7, 40.5] \\
+      1960   & 10       & 30.3             & 9.88    & [23.2, 37.4] \\
+      1970   & 10       & 28.9             & 7.22    & [23.8, 34.1] \\
+      1980   & 10       & 34.0             & 7.98    & [28.3, 39.7] \\
+      1990   & 10       & 30.9             & 7.91    & [25.3, 36.6] \\
+      2000   & 10       & 37.8             & 13.0    & [28.5, 47.0] \\
+      2010   & 10       & 30.7             & 7.89    & [25.1, 36.4] \\
+      2020   &  3       & 24.5             & 4.58    & [13.1, 35.9] \\
       \bottomrule
     \end{tabularx}
     \label{tab:precip_summary}
@@ -139,19 +141,17 @@
     \caption{Five number summary of the columns in the South England data.}
     \begin{tabularx}{\textwidth}{XXX}
       \toprule
-      & Year & Max. precip. \\
+              & Year & Max. precip. [mm] \\
       \midrule
-      Min. & 1891 & 10.35 \\
-      1st Qu. & 1924 & 22.82 \\
-      Median & 1956 & 27.95 \\
-      Mean & 1956 & 29.88 \\
-      3rd Qu. & 1989 & 36.12 \\
-      Max. & 2022 & 64.22 \\
+      Min.    & 1891 & 10.35             \\
+      1st Qu. & 1924 & 22.82             \\
+      Median  & 1956 & 27.95             \\
+      Mean    & 1956 & 29.88             \\
+      3rd Qu. & 1989 & 36.12             \\
+      Max.    & 2022 & 64.22             \\
       \bottomrule
     \end{tabularx}
   \end{table}
-  
-  
   
   \begin{figure}[H]
     \begin{center}
@@ -164,7 +164,50 @@
     precipitation per year by decade.}
     \label{fig:timeseries_precip}
   \end{figure}
-  
 
+  \section{Bayesian modelling framework}
+  Throughout the course of this article we will explore three different
+  modelling approaches, all employing a Bayesian framework and MCMC sampling
+  for posterior inference. The notation \(\mathcal M_j\) will be used to refer
+  to the models.
 
+  The first model we consider is a naive fixed-parameter model of the form
+  \begin{align*}
+    Y_t &\sim \mathrm{GEV}(\mu, \sigma, \xi), \\
+    \mu &\sim \mathcal N(0, \tau_\mu^2), \\
+    \sigma &\sim \mathrm{Exp}(\lambda_\sigma), \\
+    \beta &\sim \mathrm{Beta}(4, 4)
+  \end{align*}
+  where \(Y_t\) denotes the maximum annual precipitation at time \(t\).
+
+  The second model that is posed is a time-variant model with a linear trend
+  that can be written in the form 
+  \begin{align*}
+    Y_t &\sim \mathrm{GEV}(\mu_t, \sigma, \xi),  \\
+    \mu_t &:= \mu_0 \{1 + \Delta (t - t_c)\}, \\
+    \mu_0 &\sim \mathcal N(0, \tau_\mu^2), \\
+    \Delta &\sim \mathcal N(0, \tau_\Delta^2), \\
+    \sigma &\sim \mathrm{Exp}(\lambda_\sigma), \\
+    \xi &\sim \mathrm{Beta}(4, 4)
+  \end{align*}
+  where \(t_c\) represents the median time of the data set, calculated as
+  \(t_c = \lfloor \frac{t_N - t_1}{2} \rfloor\). The last model that we explore 
+  is a hierarchical Bayesian model of the form
+  \begin{align*}
+    Y_t &\sim \mathrm{GEV}(\mu_t, \sigma, \xi), \\
+    \mu_t &:= \sum_{k = 1}^K \beta_k (t - t_0) \mathbf 1_{t > t_k}, \\
+    \sigma &\sim \mathrm{Exp}(\lambda_\sigma), \\
+    \xi &\sim \mathrm{Beta}(4, 4).
+  \end{align*}
+  In this model, the random effects vector \(\bm \beta\) is assigned three
+  different priors;
+  \begin{align*}
+    \bm \beta \sim \mathcal N(\bm 0, \Sigma_\beta),
+    \quad \Sigma_\beta = \mathrm{diag}(\sigma_\beta), \quad
+    \sigma_\beta \sim \mathrm{Exp}(\lambda)
+  \end{align*}
+  Another prior that we will use is the Gaussian random walk. Let
+  \(v_j \sim \mathcal N(0, \sigma_v^2)\), \(j \in \{1, \ldots, K\}\) be a
+  sequence of i.i.d. normal variables. We let \(\beta_1 = v_1\) and
+  \(\beta_k = \beta_{k - 1} + v_k\) for \(k \in (1, K]\).
 \end{document}
