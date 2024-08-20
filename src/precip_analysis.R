@@ -1,128 +1,12 @@
-# Setup
-suppressMessages({
-  ggplot2::theme_set(cowplot::theme_half_open(12))
-  extrafont::font_import(pattern = "Times New Roman", prompt = FALSE)
-  extrafont::loadfonts(device = "pdf")
-})
-
 # Load in the data
 dt_maxprecip <- readr::read_csv(
   file = "data/dt_maxprecip.csv",
   show_col_types = FALSE
 )
 
-dt_precip_decade <- dt_maxprecip |>
-  dplyr::mutate(decade = (year %/% 10) * 10) |>
-  dplyr::group_by(decade) |>
-  dplyr::summarize(
-    n = dplyr::n(),
-    mean_mprecip = mean(max_precip),
-    sd_mprecip = sd(max_precip),
-    ci_95 = paste0(
-      "[",
-      signif(
-        mean_mprecip - qt(p = 0.975, df = n - 1) * sd_mprecip / sqrt(n),
-        digits = 3
-      ),
-      ", ",
-      signif(
-        mean_mprecip + qt(p = 0.975, df = n - 1) * sd_mprecip / sqrt(n),
-        digits = 3
-      ),
-      "]"
-    )
-  )
-
 model_data <- list(
   n = nrow(dt_maxprecip),
   y = dt_maxprecip$max_precip
-)
-
-# Exploratory data analysis
-
-go_timeseries <- dt_maxprecip |>
-  ggplot2::ggplot(ggplot2::aes(x = year, y = max_precip)) +
-  ggplot2::geom_line(
-    colour = "steelblue",
-    linetype = "dotted"
-  ) +
-  ggplot2::geom_point() +
-  ggplot2::labs(
-    x = "Year",
-    y = "Maximum precipitation [mm]",
-    tag = "A"
-  ) +
-  ggplot2::theme(
-    text = ggplot2::element_text(family = "serif"),
-    plot.tag = ggplot2::element_text(size = 14)
-  )
-
-ggplot2::ggsave(
-  go_timeseries,
-  device = "pdf",
-  width = 8,
-  height = 2.35,
-  file = "pdf/timeseries.pdf"
-)
-
-lin <- lm(mean_mprecip ~ decade, data = dt_precip_decade)
-
-go_precip_decade <- dt_precip_decade |>
-  ggplot2::ggplot(ggplot2::aes(x = decade, y = mean_mprecip)) +
-  ggplot2::geom_smooth(
-    method = "lm",
-    colour = "royalblue",
-    fill = "royalblue"
-  ) +
-  ggplot2::labs(
-    x = "Decade",
-    y = "Mean precipitation [mm]",
-    tag = "B1"
-  ) +
-  ggplot2::geom_point() +
-  ggplot2::theme(
-    text = ggplot2::element_text(family = "serif"),
-    plot.tag = ggplot2::element_text(size = 14)
-  )
-
-go_dist_decade <- dt_precip_decade |>
-  dplyr::mutate(
-    pred = predict(lin, data.frame(decade)),
-    devn = abs(mean_mprecip - pred)
-  ) |>
-  ggplot2::ggplot(ggplot2::aes(x = decade, y = devn)) +
-  ggplot2::labs(
-    x = "Decade",
-    y = "Residual [mm]",
-    tag = "B2"
-  ) +
-  ggplot2::geom_smooth(
-    method = "lm",
-    colour = "royalblue",
-    se = FALSE
-  ) +
-  ggplot2::geom_point() +
-  ggplot2::scale_y_continuous(limits = c(-0.25, 9)) +
-  ggplot2::theme(
-    text = ggplot2::element_text(family = "serif"),
-    plot.tag = ggplot2::element_text(size = 14)
-  )
-
-go_decade_arranged <- cowplot::plot_grid(
-  go_timeseries,
-  cowplot::plot_grid(
-    go_precip_decade,
-    go_dist_decade
-  ),
-  ncol = 1
-)
-
-ggplot2::ggsave(
-  go_decade_arranged,
-  width = 8,
-  height = 6,
-  device = "pdf",
-  file = "pdf/decade.pdf",
 )
 
 # Set up parallel cores
@@ -138,8 +22,6 @@ null_fit <- rstan::stan(
   pars = c("mu", "sigma", "xi")
 )
 
-bayesplot::mcmc_areas(as.matrix(null_fit)[, c("mu", "sigma", "xi")])
-
 # Time trend model
 timetrend_fit <- rstan::stan(
   file = "src/timetrend.stan",
@@ -149,24 +31,29 @@ timetrend_fit <- rstan::stan(
   init_r = 0.5
 )
 
-bayesplot::mcmc_trace(as.matrix(timetrend_fit))
-
 # Hierarchical model -- i.i.d. prior for random effects
 
-m <- 5
-tm <- floor(seq(1, nrow(dt_maxprecip), length = m + 2))[-c(1, m + 2)]
-
+m <- 10
+t_m <- floor(seq(1, nrow(dt_maxprecip), length = m + 2))[-c(1, m + 2)]
 
 hmodel_data <- list(
   n = nrow(dt_maxprecip),
+  m = m,
   y = dt_maxprecip$max_precip,
-  t_j = floor(seq(1, nrow(dt_maxprecip), length = m + 2))[-c(1, m + 2)]
+  t_m = floor(seq(1, nrow(dt_maxprecip), length = m + 2))[-c(1, m + 2)]
 )
 
 iid_fit <- rstan::stan(
-  file = "src/hierarchical.stan",
+  file = "src/hierarchical_iid.stan",
   data = hmodel_data,
-  iter = 2000,
+  iter = 13000,
+  warmup = 3000,
   chains = 4,
   init_r = 0.5
 )
+
+# Extract the log-likelihood matrix
+log_lik <- loo::extract_log_lik(iid_fit, parameter_name = "log_lik")
+
+# Apply Pareto Smoothed Importance Sampling
+psis_results <- loo::psis(log_lik)

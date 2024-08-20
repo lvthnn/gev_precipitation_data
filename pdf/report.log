@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.8.25)  19 AUG 2024 17:41
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.8.25)  20 AUG 2024 17:08
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -719,7 +719,7 @@ Here is how much of TeX's memory you used:
  1141 hyphenation exceptions out of 8191
  85i,12n,117p,508b,473s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/newtx/ntx-ot1-tlf.enc}{/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/newtx/ntx-ec-tlf.enc}</usr/local/texlive/2021/texmf-dist/fonts/type1/public/newtx/NewTXBMI.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/newtx/NewTXMI.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/newtx/NewTXMI7.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/newtx/txexs.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/newtx/txmiaX.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/newtx/txsys.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/newtx/ztmb.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/newtx/ztmr.pfb>
-Output written on report.pdf (4 pages, 170009 bytes).
+Output written on report.pdf (4 pages, 169499 bytes).
 PDF statistics:
  80 PDF objects out of 1000 (max. 8388607)
  51 compressed objects within 1 object stream

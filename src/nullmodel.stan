@@ -19,6 +19,6 @@ model {
   mu ~ normal(0, 100^2);
   sigma ~ exponential(0.5);
   xi_0 ~ beta(4, 4);
-
+  
   y ~ gev(mu, sigma, xi);
 }
