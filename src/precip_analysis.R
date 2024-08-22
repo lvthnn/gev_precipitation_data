@@ -33,7 +33,7 @@ timetrend_fit <- rstan::stan(
 
 # Hierarchical model -- i.i.d. prior for random effects
 
-m <- 10
+m <- 6
 t_m <- floor(seq(1, nrow(dt_maxprecip), length = m + 2))[-c(1, m + 2)]
 
 hmodel_data <- list(
@@ -46,8 +46,8 @@ hmodel_data <- list(
 iid_fit <- rstan::stan(
   file = "src/hierarchical_iid.stan",
   data = hmodel_data,
-  iter = 13000,
-  warmup = 3000,
+  iter = 2000,
+  warmup = 1000,
   chains = 4,
   init_r = 0.5
 )
