@@ -17,9 +17,9 @@ null_fit <- rstan::stan(
   file = "src/nullmodel.stan",
   data = model_data,
   chains = 4,
-  iter = 2000,
-  warmup = 1000,
-  pars = c("mu", "sigma", "xi")
+  iter = 13000,
+  warmup = 3000,
+  init_r = 0.5
 )
 
 # Time trend model
@@ -27,6 +27,7 @@ timetrend_fit <- rstan::stan(
   file = "src/timetrend.stan",
   data = model_data,
   iter = 13000,
+  warmup = 3000,
   chains = 4,
   init_r = 0.5
 )
@@ -46,14 +47,37 @@ hmodel_data <- list(
 iid_fit <- rstan::stan(
   file = "src/hierarchical_iid.stan",
   data = hmodel_data,
-  iter = 2000,
-  warmup = 1000,
+  iter = 13000,
+  warmup = 3000,
   chains = 4,
   init_r = 0.5
 )
 
-# Extract the log-likelihood matrix
-log_lik <- loo::extract_log_lik(iid_fit, parameter_name = "log_lik")
+# Evaluation
+# - PSIS
+# - WAIC
+# - QQplot (ath. smá handavinna fyrir evolutionary dreifingar)
+# - Trend línur
+# - Return level? [hentar ekki vel fyrir non-stationary]
+#   - Virkar vel fyrir stationary tímaröð
+#   - Hvaða stærð fær maður á flóði fyrir gefinn endurkomutíma?
+#     — x. t — 1/(1 - q) — q quantile af breytunni [length of return period]
+#     — y. quantile of the random variable [return level]
 
-# Apply Pareto Smoothed Importance Sampling
-psis_results <- loo::psis(log_lik)
+rw_fit <- rstan::stan(
+  file = "src/hierarchical_rw.stan",
+  data = hmodel_data,
+  iter = 13000,
+  warmup = 3000,
+  chains = 4,
+  init_r = 0.5
+)
+
+ar1_fit <- rstan::stan(
+  file = "src/hierarchical_ar1.stan",
+  data = hmodel_data,
+  iter = 13000,
+  warmup = 3000,
+  chains = 4,
+  init_r = 0.5
+)

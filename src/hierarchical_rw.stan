@@ -11,7 +11,7 @@ parameters {
   vector[m] beta;
   real<lower = 0> sigma;
   real<lower = 0> tau;
-  real<lower = 0, upper = 1> xi_0;  
+  real<lower = 0, upper = 1> xi_0;
 }
 
 transformed parameters {

@@ -16,9 +16,16 @@ transformed parameters {
 }
 
 model {
-  mu ~ normal(0, 100^2);
+  mu ~ normal(0, 10);
   sigma ~ exponential(0.5);
   xi_0 ~ beta(4, 4);
   
   y ~ gev(mu, sigma, xi);
+}
+
+generated quantities {
+  vector[n] log_lik;
+  for (i in 1:n) {
+    log_lik[i] = gev_lpdf([y[i]]' | mu, sigma, xi);
+  }
 }

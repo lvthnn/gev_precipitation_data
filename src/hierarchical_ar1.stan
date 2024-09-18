@@ -12,6 +12,7 @@ parameters {
   real<lower = 0> sigma;
   real<lower = 0> tau;
   real<lower = 0, upper = 1> xi_0;  
+  real phi;
 }
 
 transformed parameters {
@@ -21,11 +22,12 @@ transformed parameters {
 model {
   tau ~ exponential(0.5);
   sigma ~ exponential(0.5);
+  phi ~ normal(0, 0.5);
   xi_0 ~ beta(4, 4);
 
   beta[1] ~ normal(0, 10);
   for (j in 2:m)
-    beta[j] ~ normal(beta[j - 1], tau);
+    beta[j] ~ normal(phi * beta[j - 1], tau;
 
   y ~ gevh(beta, t_m, sigma, xi);
 }
