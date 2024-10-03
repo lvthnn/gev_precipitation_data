@@ -14,7 +14,7 @@ options(mc.cores = parallel::detectCores())
 
 # Null model
 null_fit <- rstan::stan(
-  file = "src/nullmodel.stan",
+  file = "src/stan/nullmodel.stan",
   data = model_data,
   chains = 4,
   iter = 13000,
@@ -24,7 +24,7 @@ null_fit <- rstan::stan(
 
 # Time trend model
 timetrend_fit <- rstan::stan(
-  file = "src/timetrend.stan",
+  file = "src/stan/timetrend.stan",
   data = model_data,
   iter = 13000,
   warmup = 3000,
@@ -45,7 +45,7 @@ hmodel_data <- list(
 )
 
 iid_fit <- rstan::stan(
-  file = "src/hierarchical_iid.stan",
+  file = "src/stan/hierarchical_iid.stan",
   data = hmodel_data,
   iter = 13000,
   warmup = 3000,
@@ -56,7 +56,7 @@ iid_fit <- rstan::stan(
 # Evaluation
 # - PSIS
 # - WAIC
-# - QQplot (ath. smá handavinna fyrir evolutionary dreifingar)
+# - QQplot (ath. smá handavinna fyrir non-stationary dreifingar)
 # - Trend línur
 # - Return level? [hentar ekki vel fyrir non-stationary]
 #   - Virkar vel fyrir stationary tímaröð
@@ -65,7 +65,7 @@ iid_fit <- rstan::stan(
 #     — y. quantile of the random variable [return level]
 
 rw_fit <- rstan::stan(
-  file = "src/hierarchical_rw.stan",
+  file = "src/stan/hierarchical_rw.stan",
   data = hmodel_data,
   iter = 13000,
   warmup = 3000,
@@ -74,7 +74,7 @@ rw_fit <- rstan::stan(
 )
 
 ar1_fit <- rstan::stan(
-  file = "src/hierarchical_ar1.stan",
+  file = "src/stan/hierarchical_ar1.stan",
   data = hmodel_data,
   iter = 13000,
   warmup = 3000,
